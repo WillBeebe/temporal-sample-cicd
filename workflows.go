@@ -30,14 +30,14 @@ func CICDWorkflow(ctx workflow.Context, input InfraDetails) (*WorkflowResult, er
 	var buildResult AppResult
 	err := workflow.ExecuteActivity(ctx, BuildImage, input).Get(ctx, &buildResult)
 	if err != nil {
-		return wfresult, fmt.Errorf("failed to get IP: %s", err)
+		return wfresult, fmt.Errorf("failed to build image: %s", err)
 	}
 
 	// Activity: push image
 	var pushResult AppResult
 	err = workflow.ExecuteActivity(ctx, PushImage, input).Get(ctx, &pushResult)
 	if err != nil {
-		return wfresult, fmt.Errorf("failed to get IP: %s", err)
+		return wfresult, fmt.Errorf("failed to push image: %s", err)
 	}
 
 	// Activity: deploy infrastructure
@@ -95,7 +95,7 @@ func CICDWorkflow(ctx workflow.Context, input InfraDetails) (*WorkflowResult, er
 		var resultDestroy InfraResult
 		err = workflow.ExecuteActivity(ctx, DestroyInfrastructure, input).Get(ctx, &resultDestroy)
 		if err != nil {
-			return wfresult, fmt.Errorf("failed to get IP: %s", err)
+			return wfresult, fmt.Errorf("failed to destroy infrastructure: %s", err)
 		}
 
 		return wfresult, err
@@ -123,7 +123,7 @@ func CICDWorkflow(ctx workflow.Context, input InfraDetails) (*WorkflowResult, er
 	var resultDestroy InfraResult
 	err = workflow.ExecuteActivity(ctx, DestroyInfrastructure, input).Get(ctx, &resultDestroy)
 	if err != nil {
-		return wfresult, fmt.Errorf("failed to get IP: %s", err)
+		return wfresult, fmt.Errorf("failed to destroy infrastructure: %s", err)
 	}
 
 	return wfresult, nil
